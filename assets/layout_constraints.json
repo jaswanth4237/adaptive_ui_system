@@ -1,0 +1,28 @@
+{
+  "constraints": [
+    {
+      "widgetId": "box1",
+      "constraint": "centerX",
+      "targetId": "parent",
+      "margin": 0
+    },
+    {
+      "widgetId": "box1",
+      "constraint": "topToTopOf",
+      "targetId": "parent",
+      "margin": 20
+    },
+    {
+      "widgetId": "box2",
+      "constraint": "leftToRightOf",
+      "targetId": "box1",
+      "margin": 10
+    },
+    {
+      "widgetId": "box2",
+      "constraint": "bottomToBottomOf",
+      "targetId": "box1",
+      "margin": 0
+    }
+  ]
+}
