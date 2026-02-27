@@ -5,24 +5,27 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
 
 class GestureLogger {
-  static Future<void> logGesture(String type, Map<String, dynamic> metadata) async {
+  static Future<void> logGesture(
+    String type,
+    Map<String, dynamic> metadata,
+  ) async {
     if (kIsWeb || Platform.environment.containsKey('FLUTTER_TEST')) return;
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/gesture_log.json');
-      
+
       Map<String, dynamic> data = {'gestures': []};
       if (await file.exists()) {
         final content = await file.readAsString();
         data = jsonDecode(content);
       }
-      
+
       (data['gestures'] as List).add({
         'type': type,
         'timestamp': DateTime.now().toIso8601String(),
         'metadata': metadata,
       });
-      
+
       await file.writeAsString(jsonEncode(data));
       debugPrint('Logged gesture: $type');
     } catch (e) {
@@ -67,7 +70,8 @@ class _CustomGestureDemoState extends State<CustomGestureDemo> {
       onPointerMove: (event) {
         if (_activePointers.length >= 2) {
           final start = _pointerStartPositions[event.pointer];
-          if (start != null && (event.position - start).distance > _tapMoveThreshold) {
+          if (start != null &&
+              (event.position - start).distance > _tapMoveThreshold) {
             _twoFingerMoved = true;
           }
         }
@@ -79,7 +83,9 @@ class _CustomGestureDemoState extends State<CustomGestureDemo> {
             final elapsedMs = DateTime.now().difference(start).inMilliseconds;
             if (elapsedMs <= _tapDurationThresholdMs) {
               setState(() => _lastGesture = 'Two-finger-tap');
-              GestureLogger.logGesture('two-finger-tap', {'durationMs': elapsedMs});
+              GestureLogger.logGesture('two-finger-tap', {
+                'durationMs': elapsedMs,
+              });
               _twoFingerTapLogged = true;
             }
           }
@@ -118,14 +124,19 @@ class _CustomGestureDemoState extends State<CustomGestureDemo> {
           if (_pinchDetected) {
             GestureLogger.logGesture('pinch-to-zoom', {'finalScale': _scale});
           } else {
-            GestureLogger.logGesture('swipe', {'velocity': details.velocity.toString()});
+            GestureLogger.logGesture('swipe', {
+              'velocity': details.velocity.toString(),
+            });
           }
         },
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Perform gestures here', style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                'Perform gestures here',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
               const SizedBox(height: 20),
               Container(
                 width: 200,
@@ -134,12 +145,17 @@ class _CustomGestureDemoState extends State<CustomGestureDemo> {
                 child: Center(child: Text('Last: $_lastGesture')),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
+              GestureDetector(
+                onDoubleTap: () {
                   setState(() => _lastGesture = 'Two-finger-tap');
                   GestureLogger.logGesture('two-finger-tap', {'source': 'button'});
                 },
-                child: const Text('Simulate Two-finger-tap'),
+                child: ElevatedButton(
+                  onPressed: () {
+                    print("Normal Press");
+                  },
+                  child: const Text('Simulate Two-finger-tap'),
+                ),
               ),
             ],
           ),
